@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Check-In — Passenger Data Form</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Grotesk:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy: #0b2540;
+    --navy-2: #123255;
+    --panel: #ffffff;
+    --stub: #f4f1e8;
+    --ink: #10233b;
+    --muted: #5c7189;
+    --amber: #e8a33d;
+    --amber-dark: #b97c1d;
+    --error: #c23b3b;
+    --error-bg: #fbe9e9;
+    --ok: #2f7d4f;
+    --ok-bg: #e6f4ea;
+    --focus: #8fc7ff;
+    --line: #d9d3c0;
+  }
+  *{ box-sizing:border-box; }
+  body{
+    margin:0;
+    min-height:100vh;
+    background:
+      linear-gradient(180deg, var(--navy) 0%, var(--navy-2) 100%);
+    font-family:'Space Grotesk', sans-serif;
+    color:#eaf1fb;
+    padding: 2.2rem 1rem 3.5rem;
+  }
+  .wrap{ max-width: 1040px; margin:0 auto; }
+
+  header.top{ text-align:center; margin-bottom:2rem; }
+  header.top .eyebrow{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:.7rem; letter-spacing:.32em; text-transform:uppercase;
+    color:#9db4cf; margin-bottom:.5rem;
+  }
+  header.top h1{
+    font-family:'Bebas Neue', sans-serif;
+    font-size: clamp(2.2rem, 6vw, 3.4rem);
+    letter-spacing:.04em;
+    margin:0;
+    color:#fff;
+  }
+  header.top .sub{ color:#a9bed6; font-size:.95rem; margin-top:.3rem; }
+
+  .layout{
+    display:grid;
+    grid-template-columns: 1.35fr 1fr;
+    gap: 1.8rem;
+    align-items:start;
+  }
+  @media (max-width: 860px){
+    .layout{ grid-template-columns: 1fr; }
+  }
+
+  /* ---- FORM PANEL ---- */
+  .form-panel{
+    background: var(--panel);
+    color: var(--ink);
+    border-radius: 8px;
+    padding: 1.8rem 1.8rem 1.6rem;
+    box-shadow: 0 20px 50px rgba(0,0,0,.35);
+  }
+  fieldset{
+    border:none;
+    padding:0;
+    margin:0 0 1.5rem;
+  }
+  legend{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:.7rem;
+    letter-spacing:.18em;
+    text-transform:uppercase;
+    color: var(--amber-dark);
+    margin-bottom:.8rem;
+    padding-bottom:.4rem;
+    border-bottom: 1px solid var(--line);
+    width:100%;
+  }
+  .field-row{
+    display:grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+  @media (max-width: 520px){ .field-row{ grid-template-columns: 1fr; } }
+
+  .field{ margin-bottom: 1rem; }
+  .field label{
+    display:block;
+    font-size:.8rem;
+    font-weight:600;
+    margin-bottom:.35rem;
+    color: var(--ink);
+  }
+  .field .req{ color: var(--error); }
+  .field input[type="text"],
+  .field input[type="email"],
+  .field input[type="password"],
+  .field input[type="tel"],
+  .field input[type="date"],
+  .field input[type="number"],
+  .field input[type="url"],
+  .field select,
+  .field textarea{
+    width:100%;
+    padding:.65rem .75rem;
+    border:1.5px solid var(--line);
+    border-radius:5px;
+    font-family:'Space Grotesk', sans-serif;
+    font-size:.92rem;
+    color: var(--ink);
+    background:#fff;
+  }
+  .field textarea{ resize:vertical; min-height:80px; }
+  .field input:focus, .field select:focus, .field textarea:focus{
+    outline:none;
+    border-color: var(--amber);
+    box-shadow: 0 0 0 3px rgba(232,163,61,.25);
+  }
+  .field input.invalid, .field select.invalid, .field textarea.invalid{
+    border-color: var(--error);
+    background: var(--error-bg);
+  }
+  .field input.valid, .field select.valid{
+    border-color: var(--ok);
+  }
+  .error-msg{
+    display:none;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:.72rem;
+    color: var(--error);
+    margin-top:.3rem;
+  }
+  .error-msg.show{ display:block; }
+  .hint{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:.7rem;
+    color: var(--muted);
+    margin-top:.3rem;
+  }
+
+  .radio-group, .checkbox-group{
+    display:flex; flex-wrap:wrap; gap: .8rem;
+  }
+  .radio-item, .checkbox-item{
+    display:flex; align-items:center; gap:.4rem;
+    font-size:.88rem;
+    background: var(--stub);
+    border:1.5px solid var(--line);
+    border-radius:20px;
+    padding:.4rem .9rem;
+    cursor:pointer;
+  }
+  .radio-item input, .checkbox-item input{ accent-color: var(--amber-dark); }
+
+  .range-row{ display:flex; align-items:center; gap:.8rem; }
+  .range-row input[type="range"]{ flex:1; accent-color: var(--amber-dark); }
+  .range-val{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:.85rem;
+    min-width: 3.4rem;
+    text-align:right;
+    color: var(--ink);
+  }
+
+  .terms-row{
+    display:flex; align-items:flex-start; gap:.6rem;
+    font-size:.85rem;
+    margin-bottom:1.2rem;
+  }
+  .terms-row input{ margin-top:.2rem; accent-color: var(--amber-dark); }
+
+  .submit-btn{
+    width:100%;
+    background: var(--amber-dark);
+    color:#fff;
+    border:none;
+    border-radius:6px;
+    padding:.9rem 1rem;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:.85rem;
+    letter-spacing:.05em;
+    cursor:pointer;
+  }
+  .submit-btn:hover{ background:#9a6516; }
+  .submit-btn:focus-visible{ outline:3px solid var(--focus); outline-offset:2px; }
+
+  .form-status{
+    margin-top:1rem;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:.8rem;
+    padding:.7rem .9rem;
+    border-radius:5px;
+    display:none;
+  }
+  .form-status.show{ display:block; }
+  .form-status.ok{ background: var(--ok-bg); color:#1c4a30; }
+  .form-status.bad{ background: var(--error-bg); color:#7a2424; }
+
+  /* ---- BOARDING PASS PREVIEW ---- */
+  .pass{
+    position: sticky;
+    top: 1.5rem;
+    background: var(--stub);
+    color: var(--ink);
+    border-radius: 8px;
+    overflow:hidden;
+    box-shadow: 0 20px 50px rgba(0,0,0,.35);
+  }
+  .pass-main{
+    padding: 1.6rem 1.5rem 1.2rem;
+    position:relative;
+  }
+  .pass-main::after{
+    content:"";
+    position:absolute; left:0; right:0; bottom:0;
+    height:0;
+    border-bottom: 2px dashed var(--line);
+  }
+  .pass-brand{
+    display:flex; justify-content:space-between; align-items:center;
+    margin-bottom:1.1rem;
+  }
+  .pass-brand .name{
+    font-family:'Bebas Neue', sans-serif;
+    font-size:1.3rem;
+    letter-spacing:.06em;
+    color: var(--amber-dark);
+  }
+  .pass-brand .code{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:.7rem;
+    color: var(--muted);
+  }
+  .pass-row{
+    display:flex; justify-content:space-between;
+    margin-bottom:.9rem;
+    gap: 1rem;
+  }
+  .pass-field{ flex:1; }
+  .pass-field .k{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:.62rem;
+    letter-spacing:.12em;
+    text-transform:uppercase;
+    color: var(--muted);
+    margin-bottom:.15rem;
+  }
+  .pass-field .v{
+    font-size:.98rem;
+    font-weight:600;
+    color: var(--ink);
+    word-break:break-word;
+  }
+  .pass-field .v.placeholder{ color:#a9a48f; font-weight:400; font-style:italic; }
+
+  .pass-stub{
+    padding: 1.1rem 1.5rem 1.4rem;
+    background: #ece7d8;
+  }
+  .barcode{
+    height:34px;
+    background: repeating-linear-gradient(
+      90deg, var(--ink) 0 2px, transparent 2px 5px,
+      var(--ink) 5px 6px, transparent 6px 11px,
+      var(--ink) 11px 14px, transparent 14px 17px
+    );
+    margin-bottom:.5rem;
+    border-radius:2px;
+  }
+  .stub-note{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:.65rem;
+    color: var(--muted);
+    text-align:center;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="eyebrow">Web Forms — Working With User Data</div>
+    <h1>✈ Passenger Check-In</h1>
+    <div class="sub">Fill in your details — your boarding pass fills in live on the right.</div>
+  </header>
+
+  <div class="layout">
+    <!-- FORM -->
+    <div class="form-panel">
+      <form id="checkinForm" novalidate>
+
+        <fieldset>
+          <legend>Passenger identity</legend>
+          <div class="field-row">
+            <div class="field">
+              <label for="fullName">Full name <span class="req">*</span></label>
+              <input type="text" id="fullName" name="fullName" placeholder="Jane Doe" required minlength="2">
+              <div class="error-msg" id="err-fullName">Please enter your full name (at least 2 characters).</div>
+            </div>
+            <div class="field">
+              <label for="dob">Date of birth <span class="req">*</span></label>
+              <input type="date" id="dob" name="dob" required>
+              <div class="error-msg" id="err-dob">Please enter a valid date of birth (must be in the past).</div>
+            </div>
+          </div>
+
+          <div class="field-row">
+            <div class="field">
+              <label for="email">Email address <span class="req">*</span></label>
+              <input type="email" id="email" name="email" placeholder="jane@example.com" required>
+              <div class="error-msg" id="err-email">Please enter a valid email address.</div>
+            </div>
+            <div class="field">
+              <label for="phone">Phone number <span class="req">*</span></label>
+              <input type="tel" id="phone" name="phone" placeholder="+1 555 123 4567" pattern="^[0-9+\-\s()]{7,20}$" required>
+              <div class="error-msg" id="err-phone">Enter a valid phone number (digits, spaces, +, - only).</div>
+            </div>
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend>Travel account</legend>
+          <div class="field-row">
+            <div class="field">
+              <label for="password">Create a password <span class="req">*</span></label>
+              <input type="password" id="password" name="password" required minlength="8">
+              <div class="hint">At least 8 characters.</div>
+              <div class="error-msg" id="err-password">Password must be at least 8 characters.</div>
+            </div>
+            <div class="field">
+              <label for="confirmPassword">Confirm password <span class="req">*</span></label>
+              <input type="password" id="confirmPassword" name="confirmPassword" required>
+              <div class="error-msg" id="err-confirmPassword">Passwords do not match.</div>
+            </div>
+          </div>
+
+          <div class="field-row">
+            <div class="field">
+              <label for="website">Frequent flyer website (optional)</label>
+              <input type="url" id="website" name="website" placeholder="https://example.com">
+              <div class="error-msg" id="err-website">Enter a valid URL starting with http:// or https://.</div>
+            </div>
+            <div class="field">
+              <label for="age">Age <span class="req">*</span></label>
+              <input type="number" id="age" name="age" min="1" max="120" required>
+              <div class="error-msg" id="err-age">Enter an age between 1 and 120.</div>
+            </div>
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend>Trip preferences</legend>
+          <div class="field-row">
+            <div class="field">
+              <label for="destination">Destination country <span class="req">*</span></label>
+              <select id="destination" name="destination" required>
+                <option value="">Select a country…</option>
+                <option>United States</option>
+                <option>United Kingdom</option>
+                <option>India</option>
+                <option>Japan</option>
+                <option>Germany</option>
+                <option>Brazil</option>
+                <option>Australia</option>
+              </select>
+              <div class="error-msg" id="err-destination">Please select a destination.</div>
+            </div>
+            <div class="field">
+              <label>Seat class <span class="req">*</span></label>
+              <div class="radio-group">
+                <label class="radio-item"><input type="radio" name="seatClass" value="Economy" required> Economy</label>
+                <label class="radio-item"><input type="radio" name="seatClass" value="Business"> Business</label>
+                <label class="radio-item"><input type="radio" name="seatClass" value="First"> First</label>
+              </div>
+              <div class="error-msg" id="err-seatClass">Please choose a seat class.</div>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="mealPref">Meal spice preference</label>
+            <div class="range-row">
+              <input type="range" id="mealPref" name="mealPref" min="0" max="5" value="2">
+              <span class="range-val" id="mealPrefVal">2 / 5</span>
+            </div>
+          </div>
+
+          <div class="field">
+            <label>Add-ons</label>
+            <div class="checkbox-group">
+              <label class="checkbox-item"><input type="checkbox" name="addon" value="Extra legroom"> Extra legroom</label>
+              <label class="checkbox-item"><input type="checkbox" name="addon" value="Priority boarding"> Priority boarding</label>
+              <label class="checkbox-item"><input type="checkbox" name="addon" value="Lounge access"> Lounge access</label>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="notes">Special requests (optional)</label>
+            <textarea id="notes" name="notes" placeholder="Wheelchair assistance, dietary needs, etc."></textarea>
+          </div>
+        </fieldset>
+
+        <div class="terms-row">
+          <input type="checkbox" id="terms" name="terms" required>
+          <label for="terms">I confirm the details above are accurate and I agree to the airline's terms of carriage. <span class="req">*</span></label>
+        </div>
+        <div class="error-msg" id="err-terms">You must confirm this before checking in.</div>
+
+        <button class="submit-btn" type="submit">Check in →</button>
+        <div class="form-status" id="formStatus"></div>
+      </form>
+    </div>
+
+    <!-- LIVE BOARDING PASS PREVIEW -->
+    <div class="pass">
+      <div class="pass-main">
+        <div class="pass-brand">
+          <span class="name">SKYFORM AIR</span>
+          <span class="code" id="passCode">BP-000000</span>
+        </div>
+        <div class="pass-row">
+          <div class="pass-field">
+            <div class="k">Passenger</div>
+            <div class="v placeholder" id="pv-name">Your name</div>
+          </div>
+          <div class="pass-field">
+            <div class="k">Class</div>
+            <div class="v placeholder" id="pv-class">—</div>
+          </div>
+        </div>
+        <div class="pass-row">
+          <div class="pass-field">
+            <div class="k">Destination</div>
+            <div class="v placeholder" id="pv-destination">—</div>
+          </div>
+          <div class="pass-field">
+            <div class="k">Contact</div>
+            <div class="v placeholder" id="pv-email">—</div>
+          </div>
+        </div>
+        <div class="pass-row">
+          <div class="pass-field">
+            <div class="k">Date of birth</div>
+            <div class="v placeholder" id="pv-dob">—</div>
+          </div>
+          <div class="pass-field">
+            <div class="k">Add-ons</div>
+            <div class="v placeholder" id="pv-addons">None selected</div>
+          </div>
+        </div>
+      </div>
+      <div class="pass-stub">
+        <div class="barcode"></div>
+        <div class="stub-note">This preview updates as you type — nothing is sent anywhere.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  const form = document.getElementById('checkinForm');
+  const status = document.getElementById('formStatus');
+
+  const fields = {
+    fullName: { el: document.getElementById('fullName'), validate: v => v.trim().length >= 2 },
+    dob: { el: document.getElementById('dob'), validate: v => !!v && new Date(v) < new Date() },
+    email: { el: document.getElementById('email'), validate: v => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) },
+    phone: { el: document.getElementById('phone'), validate: v => /^[0-9+\-\s()]{7,20}$/.test(v) },
+    password: { el: document.getElementById('password'), validate: v => v.length >= 8 },
+    confirmPassword: { el: document.getElementById('confirmPassword'), validate: v => v === document.getElementById('password').value && v.length > 0 },
+    website: { el: document.getElementById('website'), validate: v => v.trim() === '' || /^https?:\/\/.+/.test(v) },
+    age: { el: document.getElementById('age'), validate: v => v !== '' && Number(v) >= 1 && Number(v) <= 120 },
+    destination: { el: document.getElementById('destination'), validate: v => v !== '' },
+    terms: { el: document.getElementById('terms'), validate: (v, el) => el.checked },
+  };
+
+  function showError(name, isValid){
+    const errEl = document.getElementById('err-' + name);
+    const inputEl = fields[name].el;
+    if(!isValid){
+      inputEl.classList.add('invalid');
+      inputEl.classList.remove('valid');
+      if(errEl) errEl.classList.add('show');
+    } else {
+      inputEl.classList.remove('invalid');
+      inputEl.classList.add('valid');
+      if(errEl) errEl.classList.remove('show');
+    }
+  }
+
+  function validateField(name){
+    const f = fields[name];
+    const val = f.el.type === 'checkbox' ? f.el.checked : f.el.value;
+    const isValid = f.el.type === 'checkbox' ? f.validate(val, f.el) : f.validate(val);
+    showError(name, isValid);
+    return isValid;
+  }
+
+  // seat class radio validation (grouped)
+  function validateSeatClass(){
+    const checked = form.querySelector('input[name="seatClass"]:checked');
+    const errEl = document.getElementById('err-seatClass');
+    if(!checked){
+      errEl.classList.add('show');
+      return false;
+    }
+    errEl.classList.remove('show');
+    return true;
+  }
+
+  Object.keys(fields).forEach(name => {
+    const el = fields[name].el;
+    const evt = (el.tagName === 'SELECT' || el.type === 'checkbox') ? 'change' : 'input';
+    el.addEventListener(evt, () => validateField(name));
+    el.addEventListener('blur', () => validateField(name));
+  });
+  document.getElementById('password').addEventListener('input', () => {
+    if(document.getElementById('confirmPassword').value) validateField('confirmPassword');
+  });
+  form.querySelectorAll('input[name="seatClass"]').forEach(r => r.addEventListener('change', validateSeatClass));
+
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    let allValid = true;
+    Object.keys(fields).forEach(name => { if(!validateField(name)) allValid = false; });
+    if(!validateSeatClass()) allValid = false;
+
+    status.classList.remove('show', 'ok', 'bad');
+    if(allValid){
+      status.textContent = '✓ Checked in! Your boarding pass on the right is ready.';
+      status.classList.add('show', 'ok');
+    } else {
+      status.textContent = '✗ Please fix the highlighted fields before checking in.';
+      status.classList.add('show', 'bad');
+      const firstInvalid = form.querySelector('.invalid');
+      if(firstInvalid) firstInvalid.focus();
+    }
+  });
+
+  // ---- live boarding pass preview ----
+  function setPreview(id, value, fallback){
+    const el = document.getElementById(id);
+    if(value && value.trim() !== ''){
+      el.textContent = value;
+      el.classList.remove('placeholder');
+    } else {
+      el.textContent = fallback;
+      el.classList.add('placeholder');
+    }
+  }
+
+  function updatePreview(){
+    setPreview('pv-name', document.getElementById('fullName').value, 'Your name');
+    setPreview('pv-email', document.getElementById('email').value, '—');
+    setPreview('pv-destination', document.getElementById('destination').value, '—');
+    const dobVal = document.getElementById('dob').value;
+    setPreview('pv-dob', dobVal ? new Date(dobVal).toLocaleDateString() : '', '—');
+    const seatChecked = form.querySelector('input[name="seatClass"]:checked');
+    setPreview('pv-class', seatChecked ? seatChecked.value : '', '—');
+    const addons = Array.from(form.querySelectorAll('input[name="addon"]:checked')).map(c => c.value);
+    setPreview('pv-addons', addons.join(', '), 'None selected');
+  }
+
+  form.addEventListener('input', updatePreview);
+  form.addEventListener('change', updatePreview);
+
+  const mealPref = document.getElementById('mealPref');
+  const mealPrefVal = document.getElementById('mealPrefVal');
+  mealPref.addEventListener('input', () => { mealPrefVal.textContent = `${mealPref.value} / 5`; });
+
+  // random-ish boarding pass code
+  document.getElementById('passCode').textContent = 'BP-' + Math.floor(100000 + Math.random()*900000);
+
+  updatePreview();
+})();
+</script>
+</body>
+</html>
