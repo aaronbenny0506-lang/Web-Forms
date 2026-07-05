@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web Forms - User Registration</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="form-container">
+        <h2>Create an Account</h2>
+        <p>Please fill out this form to register with us.</p>
+        
+        <form id="registrationForm" novalidate>
+            <div class="form-group">
+                <label for="fullName">Full Name</label>
+                <input type="text" id="fullName" name="fullName" placeholder="John Doe" required minlength="3">
+                <span class="error-message" id="nameError"></span>
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email Address</label>
+                <input type="email" id="email" name="email" placeholder="you@example.com" required>
+                <span class="error-message" id="emailError"></span>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" placeholder="At least 6 characters" required minlength="6">
+                <span class="error-message" id="passwordError"></span>
+            </div>
+
+            <div class="form-group">
+                <label for="dob">Date of Birth</label>
+                <input type="date" id="dob" name="dob" required>
+                <span class="error-message" id="dobError"></span>
+            </div>
+
+            <div class="form-group Checkbox-group">
+                <label>Interests</label>
+                <div class="checkbox-options">
+                    <label><input type="checkbox" name="interests" value="web"> Web Development</label>
+                    <label><input type="checkbox" name="interests" value="design"> UI/UX Design</label>
+                </div>
+            </div>
+
+            <button type="submit" class="submit-btn">Submit Registration</button>
+        </form>
+        <div id="successMessage" class="success-hidden">Form submitted successfully! 🎉</div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
